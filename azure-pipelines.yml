@@ -19,7 +19,7 @@ stages:
       - job: BuildAndDeployBackend
         displayName: "Build and Deploy FastAPI Backend"
         pool:
-          vmImage: "ubuntu-latest"
+          vmImage: "MyLocalAgent"
         steps:
           - task: UsePythonVersion@0
             inputs:
@@ -58,7 +58,7 @@ stages:
       - job: BuildAndDeployFrontend
         displayName: "Build and Deploy Flask Frontend"
         pool:
-          vmImage: "ubuntu-latest"
+          vmImage: "MyLocalAgent"
         steps:
           - task: UsePythonVersion@0
             inputs:
