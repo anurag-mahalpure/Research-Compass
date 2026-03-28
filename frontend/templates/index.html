@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Compass | Intelligent Research Paper Navigator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1E293B',
+                            900: '#0F172A',
+                            950: '#020617',
+                        },
+                        accent: '#3B82F6',
+                    },
+                    fontFamily: {
+                        heading: ['"Playfair Display"', 'serif'],
+                        body: ['"Outfit"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Phosphor Icons (Sleek minimalist icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Marked for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-[#FAFAF8] dark:bg-navy-900 text-slate-800 dark:text-slate-200 font-body h-screen flex overflow-hidden antialiased selection:bg-accent selection:text-white transition-colors duration-300">
+
+    <!-- Sidebar -->
+    <aside class="w-64 border-r border-slate-200 dark:border-navy-800 bg-white/50 dark:bg-navy-950/50 flex flex-col hidden md:flex flex-shrink-0 z-50">
+        <!-- Logo -->
+        <div class="h-16 flex items-center gap-3 px-6 border-b border-slate-200 dark:border-navy-800 shrink-0">
+            <i class="ph-fill ph-compass-rose text-2xl text-accent"></i>
+            <h1 class="font-heading font-semibold text-xl tracking-wide">Research Compass</h1>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
+            <button id="nav-search" class="sidebar-nav-btn active flex items-center gap-3 px-4 py-3 rounded-xl bg-accent/10 text-accent font-medium transition-colors text-left w-full">
+                <i class="ph-bold ph-magnifying-glass text-xl"></i> Neural Search
+            </button>
+            <button id="nav-upload" class="sidebar-nav-btn flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-navy-800 font-medium transition-colors text-left w-full">
+                <i class="ph-bold ph-file-pdf text-xl"></i> Document Analysis
+            </button>
+        </nav>
+
+        <!-- Theme Toggle -->
+        <div class="p-4 border-t border-slate-200 dark:border-navy-800 shrink-0">
+            <button id="theme-toggle" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-navy-800 w-full transition-colors text-left">
+                <i class="ph ph-moon text-xl dark:hidden"></i>
+                <i class="ph ph-sun text-xl hidden dark:block"></i>
+                <span class="font-medium">Toggle Theme</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main App Container -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative bg-[#FAFAF8] dark:bg-navy-900">
+        
+        <!-- Mobile Header (Visible only on small screens) -->
+        <header class="md:hidden sticky top-0 z-40 w-full backdrop-blur-md bg-white/70 dark:bg-navy-950/70 border-b border-slate-200 dark:border-navy-800">
+            <div class="px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="ph-fill ph-compass-rose text-2xl text-accent"></i>
+                    <h1 class="font-heading font-semibold text-lg">Research</h1>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== SEARCH VIEW ==================== -->
+        <div id="search-view" class="view-container flex-1 overflow-y-auto w-full flex flex-col relative pb-32">
+            <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-8">
+        <!-- Welcome Area / Chat empty state -->
+        <div id="welcome-area" class="flex flex-col items-center justify-center py-20 animate-fade-in">
+            <h2 class="font-heading text-4xl md:text-5xl text-center mb-4 text-slate-900 dark:text-white">Discover & analyze academic literature.</h2>
+            <p class="text-slate-500 dark:text-slate-400 max-w-2xl text-center text-lg mb-10">
+                Search across Springer and Elsevier, and compare methodologies from millions of papers.
+            </p>
+        </div>
+
+        <!-- Chat Activity Feed -->
+        <div id="chat-feed" class="flex flex-col gap-8 hidden w-full max-w-6xl mx-auto">
+            <!-- Dynamic turn containers will be injected here -->
+        </div>
+    </main>
+
+    <!-- Floating Input Box -->
+    <div class="fixed bottom-0 left-0 md:left-64 right-0 p-4 pointer-events-none z-50 flex flex-col items-center justify-end">
+        
+        <!-- Action Bar (Hidden by default, slides up when papers are selected) -->
+        <div id="action-bar" class="pointer-events-auto bg-white dark:bg-navy-950 border border-slate-200 dark:border-navy-800 shadow-xl rounded-2xl py-3 px-6 mb-4 flex items-center gap-6 translate-y-[150%] opacity-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">
+            <div class="flex items-center gap-2 border-r border-slate-200 dark:border-navy-800 pr-6">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white text-xs font-semibold" id="selection-count">0</span>
+                <span class="text-sm font-medium">Selected</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btn-summarize" class="action-btn text-sm hover:text-accent font-medium flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-navy-800 transition-colors">
+                    <i class="ph ph-text-align-left text-lg"></i> Summarize
+                </button>
+                <button id="btn-compare" class="action-btn text-sm hover:text-accent font-medium flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-navy-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="ph ph-git-diff text-lg"></i> Compare (≥2)
+                </button>
+                <button id="btn-ask" class="action-btn text-sm hover:text-accent font-medium flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-navy-800 transition-colors">
+                    <i class="ph ph-question text-lg"></i> Ask Question
+                </button>
+            </div>
+        </div>
+
+            <!-- Compose Box -->
+            <div class="pointer-events-auto w-full max-w-6xl bg-white/80 dark:bg-navy-800/80 backdrop-blur-xl border border-slate-200 dark:border-navy-700 p-2 pl-6 rounded-[2rem] shadow-2xl flex items-center gap-4 transition-all focus-within:ring-2 focus-within:ring-accent focus-within:border-transparent mx-auto relative">
+                <textarea id="prompt-input" rows="1" class="flex-1 bg-transparent border-0 focus:ring-0 resize-none py-4 text-base placeholder-slate-400 dark:placeholder-slate-500 outline-none max-h-32" placeholder="Describe your research goal..."></textarea>
+            <div id="attached-file-badge" class="hidden absolute -top-12 left-8 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 px-4 py-2 rounded-full text-sm font-medium shadow-md flex items-center gap-2">
+                <i class="ph ph-file-pdf text-red-500"></i>
+                <span id="attached-file-name" class="max-w-[150px] truncate">doc.pdf</span>
+                <button id="remove-file-btn" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 ml-1"><i class="ph ph-x"></i></button>
+            </div>
+                <button id="send-btn" class="bg-accent hover:bg-blue-600 text-white p-4 rounded-full transition-transform active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="ph-fill ph-paper-plane-right text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div> <!-- End Search View -->
+
+    <!-- ==================== UPLOAD VIEW ==================== -->
+    <div id="upload-view" class="view-container hidden flex-1 overflow-y-auto w-full flex flex-col relative pb-32">
+        
+        <!-- Upload Intro Area -->
+        <div id="upload-welcome" class="flex flex-col items-center justify-center p-8 mt-20 animate-fade-in w-full max-w-4xl mx-auto flex-shrink-0 transition-all duration-500">
+            <div class="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-6">
+                <i class="ph-fill ph-file-pdf text-4xl text-accent"></i>
+            </div>
+            <h2 class="font-heading text-4xl text-center mb-4 text-slate-900 dark:text-white">Document Analysis</h2>
+            <p class="text-slate-500 dark:text-slate-400 max-w-xl text-center text-lg mb-10">
+                Upload a PDF paper to instantly generate an executive summary, extract strengths and weaknesses, and identify research gaps.
+            </p>
+
+            <!-- Massive Dropzone -->
+            <div id="empty-upload-panel" class="w-full max-w-2xl border-2 border-dashed border-slate-300 dark:border-navy-700 bg-white/50 dark:bg-navy-950/50 rounded-3xl p-16 flex flex-col items-center justify-center text-center hover:bg-accent/5 dark:hover:bg-navy-800 hover:border-accent/40 transition-all cursor-pointer group shadow-sm">
+                <div class="w-20 h-20 bg-slate-100 dark:bg-navy-800 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent/10 transition-transform">
+                    <i class="ph ph-upload-simple text-3xl text-slate-400 dark:text-slate-500 group-hover:text-accent transition-colors"></i>
+                </div>
+                <h3 class="font-semibold text-2xl mb-2 text-slate-900 dark:text-white">Drop your PDF here</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-base">Or click to browse from your computer</p>
+                <input type="file" id="pdf-upload-input" class="hidden" accept="application/pdf">
+            </div>
+        </div>
+
+        <!-- Chat Activity Feed (Upload Mode) -->
+        <div id="upload-chat-feed" class="flex flex-col gap-8 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 mt-6">
+            <!-- Upload analysis and QA will appear here -->
+        </div>
+
+        <!-- Floating Input Box (Upload QA) - Hidden initially until analysis is done -->
+        <div id="upload-input-container" class="fixed bottom-0 left-0 md:left-64 right-0 p-4 pointer-events-none z-[60] flex flex-col items-center justify-end hidden opacity-0 transition-opacity duration-500">
+            <div class="pointer-events-auto w-full max-w-6xl bg-white/80 dark:bg-navy-800/80 backdrop-blur-xl border border-slate-200 dark:border-navy-700 p-2 rounded-[2rem] shadow-2xl flex items-center gap-2 focus-within:ring-2 focus-within:ring-accent mx-auto">
+                <button id="upload-attach-btn" class="text-slate-400 hover:text-accent transition-colors p-4 rounded-full hover:bg-slate-100 dark:hover:bg-navy-700 active:scale-95 shrink-0 ml-1" title="Upload a different document">
+                    <i class="ph ph-paperclip text-2xl"></i>
+                </button>
+                <textarea id="upload-prompt-input" rows="1" class="flex-1 bg-transparent border-0 focus:ring-0 resize-none py-4 text-base placeholder-slate-400 dark:placeholder-slate-500 outline-none max-h-32" placeholder="Ask questions about this document..."></textarea>
+                <button id="upload-send-btn" class="bg-accent hover:bg-blue-600 text-white p-4 rounded-full transition-transform active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shrink-0">
+                    <i class="ph-fill ph-paper-plane-right text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+    </div> <!-- End Upload View -->
+
+    <!-- Scroll tracking & Go to bottom button -->
+    <button id="scroll-bottom-btn" class="fixed bottom-24 right-8 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 hover:text-accent shadow-lg rounded-full w-12 h-12 flex items-center justify-center opacity-0 translate-y-4 pointer-events-none transition-all duration-300 z-50 group">
+        <i class="ph-bold ph-arrow-down text-xl group-hover:animate-bounce"></i>
+    </button>
+</div> <!-- End Main Flex Wrapper -->
+
+    <!-- Template for Paper Card (Hidden) -->
+    <template id="paper-card-template">
+        <div class="paper-card border border-slate-200 dark:border-navy-700 rounded-xl p-5 cursor-pointer relative overflow-hidden transition-all duration-300 hover:border-slate-400 dark:hover:border-slate-500 bg-white dark:bg-navy-900 group">
+            <div class="absolute top-0 left-0 w-1 h-full source-indicator transition-colors"></div>
+            <div class="flex items-start gap-4 h-full">
+                <div class="pt-1">
+                    <div class="w-5 h-5 rounded-md border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center checkbox-indicator transition-colors">
+                        <i class="ph-bold ph-check text-white opacity-0 text-xs shadow-sm"></i>
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="source-badge text-xs font-bold tracking-wider uppercase px-2 py-0.5 rounded-sm">Source</span>
+                            <span class="citation-badge bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-sm text-xs font-mono font-medium flex items-center gap-1"><i class="ph-fill ph-quotes"></i> <span class="citation-count">0</span></span>
+                        </div>
+                        <span class="year-badge text-sm text-slate-500 dark:text-slate-400 font-mono">2024</span>
+                    </div>
+                    <h3 class="paper-title font-heading font-semibold text-lg leading-snug mb-2 text-slate-900 dark:text-white group-hover:text-accent transition-colors"></h3>
+                    <p class="paper-authors text-sm text-slate-600 dark:text-slate-400 mb-3 truncate font-semibold"></p>
+                    <div class="flex flex-col gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-mono mb-3 flex-1 font-semibold">
+                        <p class="paper-doi truncate"></p>
+                        <p class="paper-journal truncate"></p>
+                        <p class="paper-issn"></p>
+                    </div>
+                    <div class="flex items-center justify-end mt-auto pt-3 border-t border-slate-100 dark:border-navy-800">
+                        <a href="#" target="_blank" class="paper-link text-sm font-semibold text-accent hover:underline flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            View <i class="ph-bold ph-arrow-up-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

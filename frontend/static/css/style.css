@@ -1,0 +1,118 @@
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulse-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.blinking-cursor::after {
+    content: "▋";
+    display: inline-block;
+    animation: pulse-cursor 1s step-end infinite;
+    color: #3B82F6;
+    margin-left: 2px;
+}
+
+/* Selected Paper Card Styles */
+.paper-card.selected {
+    border-color: #3B82F6;
+    background-color: rgba(59, 130, 246, 0.03);
+}
+
+.dark .paper-card.selected {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.paper-card.selected .checkbox-indicator {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.paper-card.selected .checkbox-indicator i {
+    opacity: 1;
+}
+
+/* Source specific styling attached via JS */
+.source-springer .source-indicator { background-color: #10b981; } /* Emerald */
+.source-springer .source-badge { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+
+.source-elsevier .source-indicator { background-color: #f97316; } /* Orange */
+.source-elsevier .source-badge { color: #f97316; background: rgba(249, 115, 22, 0.1); }
+
+.source-openalex .source-indicator { background-color: #8b5cf6; } /* Violet */
+.source-openalex .source-badge { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+
+.source-arxiv .source-indicator { background-color: #ef4444; } /* Red */
+.source-arxiv .source-badge { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+/* Markdown Content Styling */
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3, 
+.markdown-content h4 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: inherit;
+}
+
+.markdown-content h1 { font-size: 1.875rem; }
+.markdown-content h2 { font-size: 1.5rem; }
+.markdown-content h3 { font-size: 1.25rem; }
+
+.markdown-content p {
+    margin-bottom: 1em;
+    line-height: 1.6;
+}
+
+.markdown-content ol, .markdown-content ul {
+    margin-bottom: 1em;
+    padding-left: 1.5em;
+}
+
+.markdown-content ul { list-style-type: disc; }
+.markdown-content ol { list-style-type: decimal; }
+.markdown-content li { margin-bottom: 0.25em; }
+
+.markdown-content strong {
+    font-weight: 600;
+    color: inherit;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #3B82F6;
+    padding-left: 1rem;
+    font-style: italic;
+    opacity: 0.8;
+}
