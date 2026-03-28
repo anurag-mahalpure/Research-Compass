@@ -6,86 +6,54 @@
 trigger:
   - main
 
-variables:
-  backendAppName: "research-compass-backend-anurag"
-  frontendAppName: "research-compass-frontend-anurag"
-  azureSubscription: "Azure for Students"
-  pythonVersion: "3.13"
+pool:
+  name: MyLocalAgent
 
-stages:
-  - stage: DeployBackend
-    displayName: "Deploy Backend"
-    jobs:
-      - job: BuildAndDeployBackend
-        displayName: "Build and Deploy FastAPI Backend"
-        pool:
-          vmImage: "MyLocalAgent"
-        steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: "$(pythonVersion)"
-            displayName: "Use Python $(pythonVersion)"
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.13"
+    displayName: "Use Python 3.13"
 
-          - script: |
-              cd backend
-              python -m pip install --upgrade pip
-              pip install -r requirements.txt
-            displayName: "Install backend dependencies"
+  - script: |
+      cd backend
+      pip install -r requirements.txt
+    displayName: "Install backend dependencies"
 
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/backend"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/backend.zip"
-              replaceExistingArchive: true
-            displayName: "Archive backend files"
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/backend"
+      includeRootFolder: false
+      archiveType: "zip"
+      archiveFile: "$(Build.ArtifactStagingDirectory)/backend.zip"
+      replaceExistingArchive: true
+    displayName: "Archive backend"
 
-          - task: AzureWebApp@1
-            inputs:
-              azureSubscription: "$(azureSubscription)"
-              appType: "webAppLinux"
-              appName: "$(backendAppName)"
-              package: "$(Build.ArtifactStagingDirectory)/backend.zip"
-              runtimeStack: "PYTHON|3.13"
-              startUpCommand: "uvicorn main:app --host 0.0.0.0 --port 8000"
-            displayName: "Deploy backend to Azure App Service"
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: "Azure for Students"
+      appType: "webAppLinux"
+      appName: "research-compass-backend-anurag"
+      package: "$(Build.ArtifactStagingDirectory)/backend.zip"
+      runtimeStack: "PYTHON|3.13"
+      startUpCommand: "uvicorn main:app --host 0.0.0.0 --port 8000"
+    displayName: "Deploy backend"
 
-  - stage: DeployFrontend
-    displayName: "Deploy Frontend"
-    dependsOn: DeployBackend
-    jobs:
-      - job: BuildAndDeployFrontend
-        displayName: "Build and Deploy Flask Frontend"
-        pool:
-          vmImage: "MyLocalAgent"
-        steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: "$(pythonVersion)"
-            displayName: "Use Python $(pythonVersion)"
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: "$(System.DefaultWorkingDirectory)/frontend"
+      includeRootFolder: false
+      archiveType: "zip"
+      archiveFile: "$(Build.ArtifactStagingDirectory)/frontend.zip"
+      replaceExistingArchive: true
+    displayName: "Archive frontend"
 
-          - script: |
-              cd frontend
-              python -m pip install --upgrade pip
-              pip install -r requirements.txt
-            displayName: "Install frontend dependencies"
-
-          - task: ArchiveFiles@2
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)/frontend"
-              includeRootFolder: false
-              archiveType: "zip"
-              archiveFile: "$(Build.ArtifactStagingDirectory)/frontend.zip"
-              replaceExistingArchive: true
-            displayName: "Archive frontend files"
-
-          - task: AzureWebApp@1
-            inputs:
-              azureSubscription: "$(azureSubscription)"
-              appType: "webAppLinux"
-              appName: "$(frontendAppName)"
-              package: "$(Build.ArtifactStagingDirectory)/frontend.zip"
-              runtimeStack: "PYTHON|3.13"
-              startUpCommand: "python app.py"
-            displayName: "Deploy frontend to Azure App Service"
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: "Azure for Students"
+      appType: "webAppLinux"
+      appName: "research-compass-frontend-anurag"
+      package: "$(Build.ArtifactStagingDirectory)/frontend.zip"
+      runtimeStack: "PYTHON|3.13"
+      startUpCommand: "python app.py"
+    displayName: "Deploy frontend"
