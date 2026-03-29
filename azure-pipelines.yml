@@ -41,6 +41,11 @@ steps:
       appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy backend"
 
+  - script: |
+      cd frontend
+      pip install -r requirements.txt
+    displayName: "Install frontend dependencies"
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/frontend"
@@ -57,7 +62,7 @@ steps:
       appName: "research-compass-frontend-anurag"
       package: "$(Build.ArtifactStagingDirectory)/frontend.zip"
       runtimeStack: "PYTHON|3.13"
-      startUpCommand: "python app.py"
+      startUpCommand: "gunicorn app:app"
       deploymentMethod: "zipDeploy"
       appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy frontend"
