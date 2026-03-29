@@ -35,10 +35,15 @@ steps:
       scriptType: "batch"
       scriptLocation: "inlineScript"
       inlineScript: |
+        echo Stopping backend...
         az webapp stop --name research-compass-backend-anurag --resource-group research-compass-rg
-        timeout /t 10 /nobreak
-        az webapp deploy --name research-compass-backend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)/backend.zip" --type zip --async false
+        echo Stop done, waiting...
+        ping 127.0.0.1 -n 11 > nul
+        echo Deploying backend...
+        az webapp deploy --name research-compass-backend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\backend.zip" --type zip
+        echo Deploy done, starting...
         az webapp start --name research-compass-backend-anurag --resource-group research-compass-rg
+        echo Backend done.
     displayName: "Deploy backend"
 
   - script: |
@@ -61,8 +66,13 @@ steps:
       scriptType: "batch"
       scriptLocation: "inlineScript"
       inlineScript: |
+        echo Stopping frontend...
         az webapp stop --name research-compass-frontend-anurag --resource-group research-compass-rg
-        timeout /t 10 /nobreak
-        az webapp deploy --name research-compass-frontend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)/frontend.zip" --type zip --async false
+        echo Stop done, waiting...
+        ping 127.0.0.1 -n 11 > nul
+        echo Deploying frontend...
+        az webapp deploy --name research-compass-frontend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\frontend.zip" --type zip
+        echo Deploy done, starting...
         az webapp start --name research-compass-frontend-anurag --resource-group research-compass-rg
+        echo Frontend done.
     displayName: "Deploy frontend"
