@@ -29,18 +29,17 @@ steps:
       replaceExistingArchive: true
     displayName: "Archive backend"
 
-  - task: AzureCLI@2
+  - task: AzureWebApp@1
     inputs:
       azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp deploy --name research-compass-backend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\backend.zip" --type zip --restart true
+      appType: "webAppLinux"
+      appName: "research-compass-backend-anurag"
+      package: "$(Build.ArtifactStagingDirectory)/backend.zip"
+      runtimeStack: "PYTHON|3.13"
+      startUpCommand: "uvicorn main:app --host 0.0.0.0 --port 8000"
+      deploymentMethod: "zipDeploy"
+      appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy backend"
-
-  - script: |
-      cd frontend
-      pip install -r requirements.txt
-    displayName: "Install frontend dependencies"
 
   - task: ArchiveFiles@2
     inputs:
@@ -51,10 +50,14 @@ steps:
       replaceExistingArchive: true
     displayName: "Archive frontend"
 
-  - task: AzureCLI@2
+  - task: AzureWebApp@1
     inputs:
       azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp deploy --name research-compass-frontend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\frontend.zip" --type zip --restart true
+      appType: "webAppLinux"
+      appName: "research-compass-frontend-anurag"
+      package: "$(Build.ArtifactStagingDirectory)/frontend.zip"
+      runtimeStack: "PYTHON|3.13"
+      startUpCommand: "python app.py"
+      deploymentMethod: "zipDeploy"
+      appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy frontend"
