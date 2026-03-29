@@ -37,6 +37,8 @@ steps:
       package: "$(Build.ArtifactStagingDirectory)/backend.zip"
       runtimeStack: "PYTHON|3.13"
       startUpCommand: "uvicorn main:app --host 0.0.0.0 --port 8000"
+      deploymentMethod: "zipDeploy"
+      appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy backend"
 
   - task: ArchiveFiles@2
@@ -56,4 +58,6 @@ steps:
       package: "$(Build.ArtifactStagingDirectory)/frontend.zip"
       runtimeStack: "PYTHON|3.13"
       startUpCommand: "python app.py"
+      deploymentMethod: "zipDeploy"
+      appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy frontend"
