@@ -29,6 +29,15 @@ steps:
       replaceExistingArchive: true
     displayName: "Archive backend"
 
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: "Azure for Students"
+      scriptType: "bash"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az webapp stop --name research-compass-backend-anurag --resource-group research-compass-rg
+    displayName: "Stop backend app service"
+
   - task: AzureWebApp@1
     inputs:
       azureSubscription: "Azure for Students"
@@ -41,6 +50,20 @@ steps:
       appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy backend"
 
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: "Azure for Students"
+      scriptType: "bash"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az webapp start --name research-compass-backend-anurag --resource-group research-compass-rg
+    displayName: "Start backend app service"
+
+  - script: |
+      cd frontend
+      pip install -r requirements.txt
+    displayName: "Install frontend dependencies"
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: "$(System.DefaultWorkingDirectory)/frontend"
@@ -49,6 +72,15 @@ steps:
       archiveFile: "$(Build.ArtifactStagingDirectory)/frontend.zip"
       replaceExistingArchive: true
     displayName: "Archive frontend"
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: "Azure for Students"
+      scriptType: "bash"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az webapp stop --name research-compass-frontend-anurag --resource-group research-compass-rg
+    displayName: "Stop frontend app service"
 
   - task: AzureWebApp@1
     inputs:
@@ -61,3 +93,12 @@ steps:
       deploymentMethod: "zipDeploy"
       appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
     displayName: "Deploy frontend"
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: "Azure for Students"
+      scriptType: "bash"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az webapp start --name research-compass-frontend-anurag --resource-group research-compass-rg
+    displayName: "Start frontend app service"
