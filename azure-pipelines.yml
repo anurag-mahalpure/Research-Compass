@@ -34,34 +34,8 @@ steps:
       azureSubscription: "Azure for Students"
       scriptType: "batch"
       scriptLocation: "inlineScript"
-      inlineScript: az webapp stop --name research-compass-backend-anurag --resource-group research-compass-rg
-    continueOnError: true
-    displayName: "Stop backend"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp config appsettings set --name research-compass-backend-anurag --resource-group research-compass-rg --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true ENABLE_ORYX_BUILD=true
-    displayName: "Set backend build settings"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp deploy --name research-compass-backend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\backend.zip" --type zip
+      inlineScript: az webapp deploy --name research-compass-backend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\backend.zip" --type zip --restart true
     displayName: "Deploy backend"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp start --name research-compass-backend-anurag --resource-group research-compass-rg
-    continueOnError: true
-    displayName: "Start backend"
 
   - script: |
       cd frontend
@@ -82,31 +56,5 @@ steps:
       azureSubscription: "Azure for Students"
       scriptType: "batch"
       scriptLocation: "inlineScript"
-      inlineScript: az webapp stop --name research-compass-frontend-anurag --resource-group research-compass-rg
-    continueOnError: true
-    displayName: "Stop frontend"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp config appsettings set --name research-compass-frontend-anurag --resource-group research-compass-rg --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true ENABLE_ORYX_BUILD=true
-    displayName: "Set frontend build settings"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp deploy --name research-compass-frontend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\frontend.zip" --type zip
+      inlineScript: az webapp deploy --name research-compass-frontend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)\frontend.zip" --type zip --restart true
     displayName: "Deploy frontend"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: az webapp start --name research-compass-frontend-anurag --resource-group research-compass-rg
-    continueOnError: true
-    displayName: "Start frontend"
