@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "https://research-compass-backend-anurag-g2bvezh6bph3bxfs.centralindia-01.azurewebsites.net";
 const sessionId = crypto.randomUUID();
 
 // State
