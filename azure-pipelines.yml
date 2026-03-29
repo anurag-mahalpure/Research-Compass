@@ -36,28 +36,10 @@ steps:
       scriptLocation: "inlineScript"
       inlineScript: |
         az webapp stop --name research-compass-backend-anurag --resource-group research-compass-rg
-    displayName: "Stop backend app service"
-
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: "Azure for Students"
-      appType: "webAppLinux"
-      appName: "research-compass-backend-anurag"
-      package: "$(Build.ArtifactStagingDirectory)/backend.zip"
-      runtimeStack: "PYTHON|3.13"
-      startUpCommand: "uvicorn main:app --host 0.0.0.0 --port 8000"
-      deploymentMethod: "zipDeploy"
-      appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
-    displayName: "Deploy backend"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: |
+        timeout /t 10 /nobreak
+        az webapp deploy --name research-compass-backend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)/backend.zip" --type zip --async false
         az webapp start --name research-compass-backend-anurag --resource-group research-compass-rg
-    displayName: "Start backend app service"
+    displayName: "Deploy backend"
 
   - script: |
       cd frontend
@@ -80,25 +62,7 @@ steps:
       scriptLocation: "inlineScript"
       inlineScript: |
         az webapp stop --name research-compass-frontend-anurag --resource-group research-compass-rg
-    displayName: "Stop frontend app service"
-
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: "Azure for Students"
-      appType: "webAppLinux"
-      appName: "research-compass-frontend-anurag"
-      package: "$(Build.ArtifactStagingDirectory)/frontend.zip"
-      runtimeStack: "PYTHON|3.13"
-      startUpCommand: "python app.py"
-      deploymentMethod: "zipDeploy"
-      appSettings: "-SCM_DO_BUILD_DURING_DEPLOYMENT true -ENABLE_ORYX_BUILD true"
-    displayName: "Deploy frontend"
-
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: "Azure for Students"
-      scriptType: "batch"
-      scriptLocation: "inlineScript"
-      inlineScript: |
+        timeout /t 10 /nobreak
+        az webapp deploy --name research-compass-frontend-anurag --resource-group research-compass-rg --src-path "$(Build.ArtifactStagingDirectory)/frontend.zip" --type zip --async false
         az webapp start --name research-compass-frontend-anurag --resource-group research-compass-rg
-    displayName: "Start frontend app service"
+    displayName: "Deploy frontend"
