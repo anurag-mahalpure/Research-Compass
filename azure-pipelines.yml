@@ -32,7 +32,7 @@ steps:
   - task: AzureCLI@2
     inputs:
       azureSubscription: "Azure for Students"
-      scriptType: "bash"
+      scriptType: "batch"
       scriptLocation: "inlineScript"
       inlineScript: |
         az webapp stop --name research-compass-backend-anurag --resource-group research-compass-rg
@@ -53,7 +53,7 @@ steps:
   - task: AzureCLI@2
     inputs:
       azureSubscription: "Azure for Students"
-      scriptType: "bash"
+      scriptType: "batch"
       scriptLocation: "inlineScript"
       inlineScript: |
         az webapp start --name research-compass-backend-anurag --resource-group research-compass-rg
@@ -76,7 +76,7 @@ steps:
   - task: AzureCLI@2
     inputs:
       azureSubscription: "Azure for Students"
-      scriptType: "bash"
+      scriptType: "batch"
       scriptLocation: "inlineScript"
       inlineScript: |
         az webapp stop --name research-compass-frontend-anurag --resource-group research-compass-rg
@@ -97,7 +97,7 @@ steps:
   - task: AzureCLI@2
     inputs:
       azureSubscription: "Azure for Students"
-      scriptType: "bash"
+      scriptType: "batch"
       scriptLocation: "inlineScript"
       inlineScript: |
         az webapp start --name research-compass-frontend-anurag --resource-group research-compass-rg
